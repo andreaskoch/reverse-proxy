@@ -39,7 +39,8 @@ RUN tar -xvzf nginx-${NGINX_VERSION}.tar.gz
 RUN mv nginx-${NGINX_VERSION} nginx-source
 WORKDIR /usr/src/nginx-source
 RUN ./configure \
-		--prefix=/usr/share/nginx \
+		--prefix=/etc/nginx \
+		--sbin-path=/usr/sbin/nginx \
 		--conf-path=/etc/nginx/nginx.conf \
 		--http-log-path=/var/log/nginx/access.log \
 		--error-log-path=/var/log/nginx/error.log \
@@ -65,8 +66,12 @@ RUN ./configure \
 		--add-module=/usr/src/ngx_pagespeed
 RUN make 
 RUN make install
-RUN ln -s /usr/share/nginx/sbin/nginx /usr/sbin/nginx
 WORKDIR /
+RUN rm -f /etc/nginx/*.default
+RUN mkdir -p /var/lib/nginx/body /var/lib/nginx/fastcgi /var/lib/nginx/proxy /var/lib/nginx/scgi /var/lib/nginx/uwsgi
+
+# Configure Nginx
+ADD conf/nginx.conf /etc/nginx/nginx.conf
 
 # Configure Cron
 ADD bin/configure-cron.sh /configure-cron.sh
