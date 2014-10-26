@@ -17,9 +17,28 @@ RUN mkdir -p /var/log/supervisor
 # Configure Supervisord
 ADD conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Install nginx
-RUN apt-get install -qy nginx
-RUN rm -rf /etc/nginx/conf.d /etc/nginx/sites-enabled /etc/nginx/sites-available
+# Download ngx_pagespeed
+WORKDIR /
+ENV NPS_VERSION 1.9.32.1
+RUN apt-get install -qy wget build-essential zlib1g-dev libpcre3 libpcre3-dev unzip
+RUN wget https://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip
+RUN unzip release-${NPS_VERSION}-beta.zip
+RUN mv /ngx_pagespeed-release-${NPS_VERSION}-beta /ngx_pagespeed
+WORKDIR /ngx_pagespeed
+RUN wget https://dl.google.com/dl/page-speed/psol/${NPS_VERSION}.tar.gz
+RUN tar -xzvf ${NPS_VERSION}.tar.gz
+
+# Install Nginx with support for page-speed
+WORKDIR /
+ENV NGINX_VERSION 1.6.1
+RUN wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
+RUN tar -xvzf nginx-${NGINX_VERSION}.tar.gz
+RUN mv /nginx-${NGINX_VERSION} /nginx-source
+WORKDIR /nginx-source
+RUN ./configure --add-module=/ngx_pagespeed
+RUN make 
+RUN make install
+WORKDIR /
 
 # Configure Cron
 ADD bin/configure-cron.sh /configure-cron.sh
