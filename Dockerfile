@@ -66,7 +66,10 @@ RUN ./configure \
 		--add-module=/usr/src/ngx_pagespeed
 RUN make 
 RUN make install
+
+# Prepare folders and files
 WORKDIR /
+RUN mkdir -p /var/ngx_pagespeed_cache
 RUN rm -f /etc/nginx/*.default
 RUN mkdir -p /var/lib/nginx/body /var/lib/nginx/fastcgi /var/lib/nginx/proxy /var/lib/nginx/scgi /var/lib/nginx/uwsgi
 
