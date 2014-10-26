@@ -65,6 +65,7 @@ RUN ./configure \
 		--add-module=/usr/src/ngx_pagespeed
 RUN make 
 RUN make install
+RUN ln -s /usr/share/nginx/sbin/nginx /usr/sbin/nginx
 WORKDIR /
 
 # Configure Cron
