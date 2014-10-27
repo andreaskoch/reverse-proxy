@@ -10,6 +10,9 @@ RUN /usr/sbin/enable_insecure_key
 
 RUN apt-get -qy update
 
+# Install base tools
+RUN apt-get install -qy wget build-essential unzip curl vim
+
 # Install supervisor
 RUN apt-get install -qy supervisor
 RUN mkdir -p /var/log/supervisor
@@ -17,10 +20,14 @@ RUN mkdir -p /var/log/supervisor
 # Configure Supervisord
 ADD conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# Download OpenSSL
+WORKDIR /usr/src
+RUN curl -L http://www.openssl.org/source/openssl-1.0.1j.tar.gz | tar -xzv
+
 # Download ngx_pagespeed
 WORKDIR /usr/src
 ENV NPS_VERSION 1.9.32.1
-RUN apt-get install -qy wget build-essential zlib1g-dev libpcre3 libpcre3-dev unzip
+RUN apt-get install -qy zlib1g-dev libpcre3 libpcre3-dev
 RUN wget https://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip
 RUN unzip release-${NPS_VERSION}-beta.zip
 RUN mv ngx_pagespeed-release-${NPS_VERSION}-beta ngx_pagespeed
@@ -62,6 +69,9 @@ RUN ./configure \
 		--with-http_spdy_module \
 		--with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2' \
 		--with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--as-needed' \
+		--with-sha1=/usr/include/openssl \
+		--with-md5=/usr/include/openssl \
+		--with-openssl='/usr/src/openssl-1.0.1j' \
 		--with-http_sub_module \
 		--add-module=/usr/src/ngx_pagespeed
 RUN make 
