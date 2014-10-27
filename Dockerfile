@@ -79,9 +79,12 @@ RUN make install
 
 # Prepare folders and files
 WORKDIR /
-RUN mkdir -p /var/ngx_pagespeed_cache
+RUN mkdir -p /var/ngx_pagespeed_cache /var/log/pagespeed
+RUN chmod go+rw /var/ngx_pagespeed_cache /var/log/pagespeed
+
 RUN rm -f /etc/nginx/*.default
 RUN mkdir -p /var/lib/nginx/body /var/lib/nginx/fastcgi /var/lib/nginx/proxy /var/lib/nginx/scgi /var/lib/nginx/uwsgi
+RUN chmod -R go+rw /var/lib/nginx
 
 # Configure Nginx
 ADD conf/nginx.conf /etc/nginx/nginx.conf
