@@ -33,7 +33,7 @@ RUN apt-get install -qy libssl-dev # ssl module
 
 # Install Nginx with support for page-speed
 WORKDIR /usr/src
-ENV NGINX_VERSION 1.6.1
+ENV NGINX_VERSION 1.7.6
 RUN wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
 RUN tar -xvzf nginx-${NGINX_VERSION}.tar.gz
 RUN mv nginx-${NGINX_VERSION} nginx-source
